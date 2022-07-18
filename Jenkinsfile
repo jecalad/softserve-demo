@@ -1,20 +1,17 @@
-pipeline{
-    
-    agent any
+node{
+    def app
 
-    stages {
-        stage("build") {
-            steps {
-                echo 'building nodejs image'
-            }
-        }
+    stage('Clone repo'){
+        checkout scm
+    }
 
+    stage("build") {
+           app = docker.build("jecalad/testing")
+    }
 
-        stage("push"){
-            steps {
-                echo 'pushing image to docker hub'
-            }
+    stage("push"){
+        docker.withRegistry('http://registry.hub.docker.com', 'jecaladDockerHub') {
+            app.push("${env.BUILD_NUMBER}")
         }
     }
-    
 }
